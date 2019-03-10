@@ -1,0 +1,22 @@
+language: julia
+
+os:
+    - linux
+    - osx
+
+julia:
+    - 1.0
+    #- nightly
+
+notifications:
+    email: false
+
+before_script:
+  - export PATH=$HOME/.local/bin:$PATH
+
+install:
+  #- sudo pip install pymdown-extensions
+
+script:
+  - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+  - julia -e 'Pkg.clone(pwd()); Pkg.build("LightChem"); Pkg.test("LightChem"; coverage=true)'
