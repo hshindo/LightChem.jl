@@ -1,48 +1,50 @@
 export readsdf
 
-function readsdf(filename::String)
-    lines = open(readlines, filename)
-    for line in lines
-
-    end
-
-
-    lines = filter(!isempty, lines)
-    natoms = parse(Int, lines[1])
-    split(lines[2], "\t")
-    for i = 3:length(lines)-3
-        items = split(lines[i], "\t")
-        atom = items[1]
-        x = parse(Float32, items[2])
-        y = parse(Float32, items[3])
-        z = parse(Float32, items[4])
-        e = parse(Float32, items[5])
-    end
+function readxyz(filename::String)
     freqs = map(x -> parse(Float32,x), split(lines[end-2],"\t"))
     smiles = lines[end-1]
     inchi = lines[end]
-    Molecule(natoms, [], smiles, inchi)
+end
+
+function readsdf(filename::String)
+    lines = open(readlines, filename)
+    buffer = String[]
+    mols = Molecule[]
+    for line in lines
+        push!(buffer, line)
+        if line == raw"$$$$"
+            mol = parsemol(buffer)
+            push!(mols, mol)
+            empty!(buffer)
+        end
+    end
+    mols
 end
 
 function parsemol(lines::Vector{String})
-    items = split(lines[4], ' ', keepempty=false)
-    natoms = parse(Int, items[1])
-    nbonds = parse(Int, items[2])
-    # Atom block
+    line = lines[4]
+    natoms = parse(Int, line[1:3])
+    nbonds = parse(Int, line[4:6])
+
+    atoms = Atom[]
     for i = 5:5+natoms-1
-        items = split(lines[i], ' ', keepempty=false)
-        x = parse(Float64, items[1])
-        y = parse(Float64, items[2])
-        z = parse(Float64, items[3])
-        atom = items[4]
+        line = lines[i]
+        x = parse(Float64, line[1:10])
+        y = parse(Float64, line[11:20])
+        z = parse(Float64, line[21:30])
+        symbol = strip(line[32:34])
+        push!(atoms, Atom(symbol,x,y,z))
     end
-    # Bond block
-    k = 5+ntoms
+
+    bonds = Bond[]
+    k = 5 + natoms
     for i = k:k+nbonds-1
-        items = split(lines[i], ' ', keepempty=false)
-        id1 = parse(Int, items[1])
-        id2 = parse(Int, items[2])
-        bondtype = parse(Int, items[3])
-        
+        line = lines[i]
+        id1 = parse(Int, line[1:3])
+        id2 = parse(Int, line[4:6])
+        type = parse(Int, line[7:9])
+        stereo = parse(Int, line[10:12])
+        push!(bonds, Bond(id1,id2,type,stereo))
     end
+    Molecule(atoms, bonds)
 end

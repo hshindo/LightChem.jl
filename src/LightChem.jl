@@ -1,5 +1,6 @@
 module LightChem
 
-include("nn.jl")
+include("molecule.jl")
+include("io.jl")
 
 end
