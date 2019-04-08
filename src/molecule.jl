@@ -63,7 +63,7 @@ function parsemol(lines::Vector{String})
         stereo = parse(Int, line[10:12])
         push!(bonds, Bond(id1,id2,type,stereo))
     end
-    props = Dict{String}()
+    props = Dict{String,Any}()
     k = k + nbonds
     k = findnext(x == "M  END", lines, k+1)
     for i = k:3length(lines)
