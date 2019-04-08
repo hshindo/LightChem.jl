@@ -64,6 +64,7 @@ function parsemol(lines::Vector{String})
         push!(bonds, Bond(id1,id2,type,stereo))
     end
     props = Dict{String,Any}()
+    #=
     k = k + nbonds
     k = findnext(x -> x == "M  END", lines, k+1)
     for i = k:3length(lines)
@@ -75,6 +76,7 @@ function parsemol(lines::Vector{String})
         val = lines[i+1]
         props[key] = val
     end
+    =#
     Molecule(atoms, bonds, props)
 end
 
