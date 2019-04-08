@@ -2,5 +2,6 @@ sandbox.jl
 benchmark.jl
 .data
 *.h5
+*.json
 *.jld2
 Manifest.toml
