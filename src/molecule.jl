@@ -65,7 +65,7 @@ function parsemol(lines::Vector{String})
     end
     props = Dict{String,Any}()
     k = k + nbonds
-    k = findnext(x == "M  END", lines, k+1)
+    k = findnext(x -> x == "M  END", lines, k+1)
     for i = k:3length(lines)
         line = lines[i]
         @assert line[1] == '<'
