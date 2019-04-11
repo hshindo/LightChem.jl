@@ -8,6 +8,7 @@ struct Atom
     y::Float64
     z::Float64
 end
+Atom(symbol) = Atom(symbol, 0.0, 0.0, 0.0)
 
 struct Bond
     i::Int
@@ -21,9 +22,32 @@ struct Molecule
     bonds::Vector{Bond}
     props::Dict
 end
+Molecule(atoms, bonds) = Molecule(atoms, bonds, Dict())
 
 natoms(m::Molecule) = length(m.atoms)
 nbonds(m::Molecule) = length(m.bonds)
+
+function secondorder(mol::Molecule)
+    neighbors = [Int[] for _=1:natoms(mol)]
+    for b in mol.bonds
+        @assert b.i != b.j
+        push!(neighbors[b.i], b.j)
+        push!(neighbors[b.j], b.i)
+    end
+    bonds = Bond[]
+    for i = 1:natoms(mol)
+        ns = neighbors[i]
+        set = Set(ns)
+        for j in ns
+            push!(set, neighbors[j]...)
+        end
+        ks = filter(k -> i < k, collect(set))
+        for k in ks
+            push!(bonds, Bond(i,k,0,0))
+        end
+    end
+    Molecule(mol.atoms, bonds)
+end
 
 function readsdf(filename::String)
     lines = open(readlines, filename)
