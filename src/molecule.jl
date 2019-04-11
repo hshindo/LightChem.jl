@@ -42,6 +42,12 @@ function secondorder(mol::Molecule)
             push!(set, neighbors[j]...)
             for k in neighbors[j]
                 push!(set, neighbors[k]...)
+                for l in neighbors[k]
+                    push!(set, neighbors[l]...)
+                    for m in neighbors[l]
+                        push!(set, neighbors[m]...)
+                    end
+                end
             end
         end
         ks = filter(k -> i < k, collect(set))
