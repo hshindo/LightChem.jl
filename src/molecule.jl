@@ -1,5 +1,5 @@
 export Atom, Bond, Molecule
-export natoms, nbonds
+export complete, natoms, nbonds
 export readsdf
 
 struct Atom
@@ -8,6 +8,7 @@ struct Atom
     y::Float64
     z::Float64
 end
+
 Atom(symbol) = Atom(symbol, 0.0, 0.0, 0.0)
 
 struct Bond
@@ -17,15 +18,28 @@ struct Bond
     stereo::Int
 end
 
+Bond(i, j) = Bond(i, j, 0, 0)
+
 struct Molecule
     atoms::Vector{Atom}
     bonds::Vector{Bond}
     props::Dict
 end
+
 Molecule(atoms, bonds) = Molecule(atoms, bonds, Dict())
 
 natoms(m::Molecule) = length(m.atoms)
 nbonds(m::Molecule) = length(m.bonds)
+
+function complete(mol::Molecule)
+    bonds = Bond[]
+    for i = 1:natoms(mol)
+        for j = i+1:natoms(mol)
+            push!(bonds, Bond(i,j))
+        end
+    end
+    Molecule(mol.atoms, bonds)
+end
 
 function secondorder(mol::Molecule)
     neighbors = [Int[] for _=1:natoms(mol)]
