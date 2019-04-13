@@ -27,6 +27,7 @@ struct Molecule
 end
 
 Molecule(atoms, bonds) = Molecule(atoms, bonds, Dict())
+Molecule(atoms) = Molecule(atoms, Bond[])
 
 natoms(m::Molecule) = length(m.atoms)
 nbonds(m::Molecule) = length(m.bonds)
