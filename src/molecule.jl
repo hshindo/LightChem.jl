@@ -29,6 +29,9 @@ end
 Molecule(atoms, bonds) = Molecule(atoms, bonds, Dict())
 Molecule(atoms) = Molecule(atoms, Bond[])
 
+Base.getindex(mol::Molecule, key) = mol.props[key]
+Base.setindex!(mol::Molecule, value, key) = mol.props[key] = value
+
 natoms(m::Molecule) = length(m.atoms)
 nbonds(m::Molecule) = length(m.bonds)
 
