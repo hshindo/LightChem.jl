@@ -46,9 +46,22 @@ function complete(mol::Molecule)
 end
 
 function removeHs(mol::Molecule)
-    atoms = filter(a -> a.symbol != "H", mol.atoms)
-    bonds = filter(mol.bonds) do b
-        mol.atoms[b.i].symbol != "H" && mol.atoms[b.j].symbol != "H"
+    atom2id = IdDict()
+    atoms = Atom[]
+    for a in mol.atoms
+        a.symbol == "H" && continue
+        atom2id[a] = length(atom2id) + 1
+        push!(atoms, a)
+    end
+    bonds = Bond[]
+    for b in mol.bonds
+        a = mol.atoms[b.i]
+        haskey(atom2id,a) || continue
+        i = atom2id[a]
+        a = mol.atoms[b.j]
+        haskey(atom2id,a) || continue
+        j = atom2id[a]
+        push!(bonds, Bond(i,j,b.type,b.stereo))
     end
     Molecule(atoms, bonds)
 end
