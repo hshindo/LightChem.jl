@@ -62,11 +62,7 @@ function removeHs(mol::Molecule)
         j = dict[b.j]
         push!(bonds, Bond(i,j,b.type,b.stereo))
     end
-    if isempty(atoms) || isempty(bonds)
-        println(mol.atoms)
-        println(mol.bonds)
-    end
-    @assert !isempty(atoms) && !isempty(bonds)
+    @assert !isempty(atoms)
     Molecule(atoms, bonds)
 end
 
