@@ -46,23 +46,23 @@ function complete(mol::Molecule)
 end
 
 function removeHs(mol::Molecule)
-    atom2id = IdDict()
+    dict = Dict()
     atoms = Atom[]
-    for a in mol.atoms
+    for i = 1:natoms(mol)
+        a = mol.atoms[i]
         a.symbol == "H" && continue
-        atom2id[a] = length(atom2id) + 1
+        dict[i] = length(dict) + 1
         push!(atoms, a)
     end
     bonds = Bond[]
     for b in mol.bonds
-        a = mol.atoms[b.i]
-        haskey(atom2id,a) || continue
-        i = atom2id[a]
-        a = mol.atoms[b.j]
-        haskey(atom2id,a) || continue
-        j = atom2id[a]
+        haskey(dict,b.i) || continue
+        i = dict[b.i]
+        haskey(dict,b.j) || continue
+        j = dict[b.j]
         push!(bonds, Bond(i,j,b.type,b.stereo))
     end
+    @assert !isempty(atoms) && !isempty(bonds)
     Molecule(atoms, bonds)
 end
 
