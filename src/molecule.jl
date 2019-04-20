@@ -1,5 +1,5 @@
 export Atom, Bond, Molecule
-export complete, natoms, nbonds
+export complete, removeHs, natoms, nbonds
 export readsdf
 
 struct Atom
@@ -43,6 +43,14 @@ function complete(mol::Molecule)
         end
     end
     Molecule(mol.atoms, bonds)
+end
+
+function removeHs(mol::Molecule)
+    atoms = filter(a -> a.symbol != "H", mol.atoms)
+    bonds = filter(mol.bonds) do b
+        mol.atoms[b.i].symbol != "H" && mol.atoms[b.j].symbol != "H"
+    end
+    Molecule(atoms, bonds)
 end
 
 function secondorder(mol::Molecule)
