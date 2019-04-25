@@ -36,10 +36,13 @@ natoms(m::Molecule) = length(m.atoms)
 nbonds(m::Molecule) = length(m.bonds)
 
 function complete(mol::Molecule)
-    bonds = Bond[]
+    dict = Dict((b.i,b.j) => b for b in mol.bonds)
+    bonds = [mol.bonds...]
     for i = 1:natoms(mol)
         for j = i+1:natoms(mol)
-            push!(bonds, Bond(i,j))
+            if !haskey(dict, (i,j))
+                push!(bonds, Bond(i,j))
+            end
         end
     end
     Molecule(mol.atoms, bonds)
