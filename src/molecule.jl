@@ -1,6 +1,7 @@
 export Atom, Bond, Molecule
 export complete, removeHs, natoms, nbonds
-export readsdf
+export readsdf, writesdf
+using Printf
 
 struct Atom
     symbol::String
@@ -21,13 +22,14 @@ end
 Bond(i, j) = Bond(i, j, 0, 0)
 
 struct Molecule
+    name::String
     atoms::Vector{Atom}
     bonds::Vector{Bond}
     props::Dict
 end
 
-Molecule(atoms, bonds) = Molecule(atoms, bonds, Dict())
-Molecule(atoms) = Molecule(atoms, Bond[])
+Molecule(name::String, atoms, bonds) = Molecule(name, atoms, bonds, Dict())
+# Molecule(atoms) = Molecule(atoms, Bond[])
 
 Base.getindex(mol::Molecule, key) = mol.props[key]
 Base.setindex!(mol::Molecule, value, key) = mol.props[key] = value
@@ -45,7 +47,7 @@ function complete(mol::Molecule)
             end
         end
     end
-    Molecule(mol.atoms, bonds)
+    Molecule(mil.name, mol.atoms, bonds)
 end
 
 function removeHs(mol::Molecule)
@@ -115,7 +117,31 @@ function readsdf(filename::String)
     mols
 end
 
+function writesdf(filename::String, mols::Vector{Molecule})
+    open(filename, "w") do io
+        for m in mols
+            println(io, m.name)
+            println(io, "LightChem")
+            println(io, "")
+            @printf(io, "%03s%03s%03s", natoms(m), nbonds(m), 0)
+            for a in m.atoms
+                @printf(io, "%10s%10s%10s %-03s", a.x, a.y, a.z, a,symbol)
+            end
+            for b in m.bonds
+                @printf(io, "%03s%03s%03s%03s%03s%03s%03s%03s", b.i, b.j, b.type b.stereo, 0, 0, 0, 0)
+            end
+            println(io, "M  END")
+            for (k,v) in m.props
+                println(io, "> <$k>")
+                println(io, v)
+                println(io, "")
+            end
+        end
+    end
+end
+
 function parsemol(lines::Vector{String})
+    name = lines[1]
     line = lines[4]
     natoms = parse(Int, line[1:3])
     nbonds = parse(Int, line[4:6])
@@ -139,7 +165,6 @@ function parsemol(lines::Vector{String})
         push!(bonds, Bond(id1,id2,type,stereo))
     end
     props = Dict{String,Any}()
-    #=
     k = k + nbonds
     k = findnext(x -> x == "M  END", lines, k+1)
     for i = k:3length(lines)
@@ -151,8 +176,7 @@ function parsemol(lines::Vector{String})
         val = lines[i+1]
         props[key] = val
     end
-    =#
-    Molecule(atoms, bonds, props)
+    Molecule(name, atoms, bonds, props)
 end
 
 function mols2h5(filename::String, mols::Vector{Molecule})
