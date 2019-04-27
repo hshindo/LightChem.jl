@@ -165,7 +165,7 @@ function parsemol(lines::Vector{String})
         push!(bonds, Bond(id1,id2,type,stereo))
     end
     props = Dict{String,Any}()
-    k = findnext(x -> x == "M  END", lines, k+nbonds)
+    k = findnext(x -> x == "M  END", lines, k+nbonds) + 1
     for i = k:(3length(lines))
         line = lines[i]
         @assert line[1] == '<'
