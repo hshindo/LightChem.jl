@@ -118,30 +118,6 @@ function readsdf(filename::String)
     mols
 end
 
-function writesdf(filename::String, mols::Vector{Molecule})
-    open(filename, "w") do io
-        for m in mols
-            println(io, m.name)
-            println(io, "LightChem")
-            println(io, "")
-            @printf(io, "%03s%03s%03s\n", natoms(m), nbonds(m), 0)
-            for a in m.atoms
-                @printf(io, "%10s%10s%10s %-03s\n", a.x, a.y, a.z, a.symbol)
-            end
-            for b in m.bonds
-                @printf(io, "%03s%03s%03s%03s%03s%03s%03s\n", b.i, b.j, b.type, b.stereo, 0, 0, 0)
-            end
-            println(io, "M  END")
-            for (k,v) in m.props
-                println(io, "> <$k>")
-                println(io, v)
-                println(io, "")
-            end
-            println(io, raw"$$$$")
-        end
-    end
-end
-
 function parsemol(lines::Vector{String})
     name = lines[1]
     line = lines[4]
@@ -167,17 +143,42 @@ function parsemol(lines::Vector{String})
         push!(bonds, Bond(id1,id2,type,stereo))
     end
     props = Dict{String,Any}()
-    k = findnext(x -> x == "M  END", lines, k+nbonds) + 1
-    for i = k:length(lines)
+    i = findnext(x -> x == "M  END", lines, k+nbonds) + 1
+    while i < length(lines)
         line = lines[i]
         @assert line[1] == '<'
         s = findnext("<", line, 3)
         e = findnext(">", line, s+1)
         key = line[s+1:e-1]
-        val = lines[i+1]
-        props[key] = val
+        j = findnext(isempty, lines, i+1)
+        props[key] = join(lines[i+1:j-1])
+        i = j + 1
     end
     Molecule(name, atoms, bonds, props)
+end
+
+function writesdf(filename::String, mols::Vector{Molecule})
+    open(filename, "w") do io
+        for m in mols
+            println(io, m.name)
+            println(io, "  LightChem")
+            println(io, "")
+            @printf(io, "%03s%03s%03s\n", natoms(m), nbonds(m), 0)
+            for a in m.atoms
+                @printf(io, "%10s%10s%10s %-03s\n", a.x, a.y, a.z, a.symbol)
+            end
+            for b in m.bonds
+                @printf(io, "%03s%03s%03s%03s%03s%03s%03s\n", b.i, b.j, b.type, b.stereo, 0, 0, 0)
+            end
+            println(io, "M  END")
+            for (k,v) in m.props
+                println(io, "> <$k>")
+                println(io, v)
+                println(io, "")
+            end
+            println(io, raw"$$$$")
+        end
+    end
 end
 
 function mols2h5(filename::String, mols::Vector{Molecule})
