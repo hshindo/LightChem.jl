@@ -146,7 +146,7 @@ function parsemol(lines::Vector{String})
     i = findnext(x -> x == "M  END", lines, k+nbonds) + 1
     while i < length(lines)
         line = lines[i]
-        @assert line[1] == '<'
+        @assert line[1] == '>'
         s = findnext("<", line, 3)
         e = findnext(">", line, s+1)
         key = line[s+1:e-1]
