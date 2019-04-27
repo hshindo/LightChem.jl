@@ -107,11 +107,12 @@ function readsdf(filename::String)
     buffer = String[]
     mols = Molecule[]
     for line in lines
-        push!(buffer, line)
         if line == raw"$$$$"
             mol = parsemol(buffer)
             push!(mols, mol)
             buffer = String[]
+        else
+            push!(buffer, line)
         end
     end
     mols
@@ -166,7 +167,7 @@ function parsemol(lines::Vector{String})
     end
     props = Dict{String,Any}()
     k = findnext(x -> x == "M  END", lines, k+nbonds) + 1
-    for i = k:(3length(lines))
+    for i = k:length(lines)
         line = lines[i]
         @assert line[1] == '<'
         s = findnext("<", line, 3)
