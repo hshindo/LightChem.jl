@@ -108,6 +108,7 @@ function readsdf(filename::String)
     mols = Molecule[]
     for line in lines
         if line == raw"$$$$"
+            println("ok")
             mol = parsemol(buffer)
             push!(mols, mol)
             buffer = String[]
