@@ -129,7 +129,7 @@ function writesdf(filename::String, mols::Vector{Molecule})
                 @printf(io, "%10s%10s%10s %-03s\n", a.x, a.y, a.z, a.symbol)
             end
             for b in m.bonds
-                @printf(io, "%03s%03s%03s%03s%03s%03s%03s%03s\n", b.i, b.j, b.type, b.stereo, 0, 0, 0, 0)
+                @printf(io, "%03s%03s%03s%03s%03s%03s%03s\n", b.i, b.j, b.type, b.stereo, 0, 0, 0)
             end
             println(io, "M  END")
             for (k,v) in m.props
@@ -137,6 +137,7 @@ function writesdf(filename::String, mols::Vector{Molecule})
                 println(io, v)
                 println(io, "")
             end
+            println(io, "$$$$")
         end
     end
 end
