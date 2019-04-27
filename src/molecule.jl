@@ -137,7 +137,7 @@ function writesdf(filename::String, mols::Vector{Molecule})
                 println(io, v)
                 println(io, "")
             end
-            println(io, "$$$$")
+            println(io, raw"$$$$")
         end
     end
 end
