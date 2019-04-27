@@ -147,8 +147,8 @@ function parsemol(lines::Vector{String})
     while i < length(lines)
         line = lines[i]
         @assert line[1] == '>'
-        s = findnext("<", line, 3)
-        e = findnext(">", line, s+1)
+        s = first(findnext("<",line,3))
+        e = first(findnext(">",line,s+1))
         key = line[s+1:e-1]
         j = findnext(isempty, lines, i+1)
         props[key] = join(lines[i+1:j-1])
