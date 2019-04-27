@@ -47,7 +47,7 @@ function complete(mol::Molecule)
             end
         end
     end
-    Molecule(mil.name, mol.atoms, bonds)
+    Molecule(mol.name, mol.atoms, bonds, copy(mol.props))
 end
 
 function removeHs(mol::Molecule)
