@@ -181,12 +181,21 @@ function writesdf(filename::String, mols::Vector{Molecule})
     end
 end
 
-function mols2h5(filename::String, mols::Vector{Molecule})
-    atom1 = String[]
-    atom2 = Float64[]
-    for m in mols
-        for atom in m.atoms
-            push!(atom1, atom.symbol)
-        end
+export firstorder
+function firstorder(mol::Molecule)
+    neighbors = [String[] for _=1:natoms(mol)]
+    for b in mol.bonds
+        s1 = mol.atoms[b.i].symbol
+        s2 = mol.atoms[b.j].symbol
+        push!(neighbors[b.i], s2)
+        push!(neighbors[b.j], s1)
     end
+    atoms = Atom[]
+    for i = 1:natoms(mol)
+        ns = sort!(neighbors[i])
+        a = mol.atoms[i]
+        s = "$(a.symbol) $(join(ns))"
+        push!(atoms, Atom(s,a.x,a.y,a.z))
+    end
+    Molecule(mol.name, atoms, mol.bonds, copy(mol.props))
 end
